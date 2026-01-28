@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white p-3 rounded shadow-sm">
+  <h1 class="h4">{{ customer.full_name }}</h1>
+  <p class="text-muted">{{ customer.email or "No email provided" }}</p>
+
+  <hr>
+
+  <h2 class="h6">Add Usage</h2>
+  <form method="post" action="{{ url_for('add_usage', customer_id=customer.id) }}" class="row g-2">
+    <div class="col-4">
+      <input class="form-control" name="month" placeholder="2026-01" required>
+    </div>
+    <div class="col-4">
+      <select class="form-select" name="utility_type">
+        <option value="electric">electric</option>
+        <option value="water">water</option>
+        <option value="gas">gas</option>
+      </select>
+    </div>
+    <div class="col-4">
+      <input class="form-control" name="usage_value" placeholder="350" required>
+    </div>
+    <div class="col-12">
+      <button class="btn btn-success">Add Usage</button>
+    </div>
+  </form>
+
+  <hr>
+
+  <h2 class="h6">Usage Records</h2>
+  <ul class="list-group">
+    {% for r in usage %}
+      <li class="list-group-item">
+        {{ r.month }} — {{ r.utility_type }} — {{ r.usage_value }}
+      </li>
+    {% else %}
+      <li class="list-group-item text-muted">No usage records.</li>
+    {% endfor %}
+  </ul>
+
+  <hr>
+
+  <h2 class="h6">Bills</h2>
+  <ul class="list-group">
+    {% for b in bills %}
+      <li class="list-group-item">
+        {{ b.month }} — {{ b.utility_type }} — ${{ "%.2f"|format(b.total_amount) }}
+      </li>
+    {% else %}
+      <li class="list-group-item text-muted">No bills generated.</li>
+    {% endfor %}
+  </ul>
+
+  <hr>
+
+  <h2 class="h6">Electric Usage Chart</h2>
+  <img class="img-fluid border"
+       src="{{ url_for('usage_chart', customer_id=customer.id) }}"
+       alt="Usage chart">
+</div>
+{% endblock %}

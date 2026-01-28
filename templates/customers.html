@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="bg-white p-3 rounded shadow-sm">
+      <h2 class="h5">Add Customer</h2>
+
+      <form method="post">
+        <div class="mb-2">
+          <label class="form-label">Full Name</label>
+          <input class="form-control" name="full_name" required>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Email</label>
+          <input class="form-control" name="email">
+        </div>
+
+        <button class="btn btn-success">Add Customer</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="bg-white p-3 rounded shadow-sm">
+      <h2 class="h5">Customers</h2>
+
+      <ul class="list-group mt-3">
+        {% for customer in customers %}
+          <li class="list-group-item d-flex justify-content-between">
+            {{ customer.full_name }}
+            <a class="btn btn-sm btn-outline-primary"
+               href="{{ url_for('customer_detail', customer_id=customer.id) }}">
+              View
+            </a>
+          </li>
+        {% else %}
+          <li class="list-group-item text-muted">No customers yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
