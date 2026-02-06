@@ -1,0 +1,40 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36" version="29.3.7">
+  <diagram name="Page-1" id="gxDFDdmkIF0o_vya_g-7">
+    <mxGraphModel dx="1426" dy="777" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="D0eJ3033bDv7KwPbUbHn-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="User Browser&lt;div&gt;(HTML/Bootstrap UI)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="200" x="325" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="D0eJ3033bDv7KwPbUbHn-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Flask Web Server&lt;div&gt;Routing + Controllers&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="200" x="325" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="D0eJ3033bDv7KwPbUbHn-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Billing Engine&lt;div&gt;Anomaly Detection&lt;/div&gt;&lt;div&gt;Usage Processing&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="200" x="325" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="D0eJ3033bDv7KwPbUbHn-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="SQLite Database&lt;div&gt;(SQLAlchemy ORM)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="200" x="325" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="D0eJ3033bDv7KwPbUbHn-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Pandas Processing&lt;div&gt;Matplotlib Processes&lt;/div&gt;&lt;div&gt;Usage Trends &amp;amp; Alerts&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="200" x="325" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="D0eJ3033bDv7KwPbUbHn-6" parent="1" style="html=1;shadow=0;dashed=0;align=center;verticalAlign=middle;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;direction=south;notch=0;" value="" vertex="1">
+          <mxGeometry height="60" width="40" x="405" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="D0eJ3033bDv7KwPbUbHn-7" parent="1" style="html=1;shadow=0;dashed=0;align=center;verticalAlign=middle;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;direction=south;notch=0;" value="" vertex="1">
+          <mxGeometry height="60" width="40" x="405" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="D0eJ3033bDv7KwPbUbHn-8" parent="1" style="html=1;shadow=0;dashed=0;align=center;verticalAlign=middle;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;direction=south;notch=0;" value="" vertex="1">
+          <mxGeometry height="60" width="40" x="405" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="D0eJ3033bDv7KwPbUbHn-9" parent="1" style="html=1;shadow=0;dashed=0;align=center;verticalAlign=middle;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;direction=south;notch=0;" value="" vertex="1">
+          <mxGeometry height="60" width="40" x="405" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="D0eJ3033bDv7KwPbUbHn-10" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=#d6b656;fillColor=#fff2cc;align=center;verticalAlign=middle;rounded=0;fontSize=40;fontStyle=4;" value="Layered System Architecture" vertex="1">
+          <mxGeometry height="30" width="520" x="160" y="870" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
