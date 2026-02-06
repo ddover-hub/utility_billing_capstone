@@ -1,6 +1,10 @@
 Utility Billing Analytics System
 Overview
 
+## System Architecture
+
+![System Architecture](docs/system_architecture.png)
+
 The Utility Billing Analytics System is a full-stack web application designed to help utility providers manage customer usage, generate billing records, and detect abnormal consumption patterns using data analytics.
 
 This project was developed as a senior capstone to demonstrate skills in software engineering, database design, analytics, and system architecture.
