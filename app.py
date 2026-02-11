@@ -3,21 +3,54 @@ import os
 from datetime import date, datetime
 
 import matplotlib
-matplotlib.use("Agg")  # important for servers/deploy
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from flask import Flask, Response, redirect, render_template, request, url_for, flash
+from flask import Flask, Response, redirect, render_template, request, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import UniqueConstraint
+from functools import wraps
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "dev-secret-change-me"
+
+# Auth / session config
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-change-me")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
+
+# Database config
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, "utility.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
+def login_required(view_func):
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        if not session.get("is_admin"):
+            return redirect(url_for("login"))
+        return view_func(*args, **kwargs)
+    return wrapper
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        pw = request.form.get("password", "")
+        if pw == ADMIN_PASSWORD:
+            session["is_admin"] = True
+            flash("Logged in.", "success")
+            return redirect(url_for("home"))
+        flash("Wrong password.", "danger")
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("Logged out.", "info")
+    return redirect(url_for("home"))
 
 with app.app_context():
     db.create_all()
