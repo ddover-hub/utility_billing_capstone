@@ -1,18 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="row justify-content-center">
-  <div class="col-md-5">
-    <div class="bg-white p-4 rounded shadow-sm">
-      <h1 class="h5 mb-3">Admin Login</h1>
+  <div class="col-md-6 col-lg-5">
+    <div class="card-ui bg-white p-4 p-md-5">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <h2 class="page-title h4 mb-1">Admin Login</h2>
+          <div class="text-muted">Enter your admin password to manage records.</div>
+        </div>
+        <span class="badge-soft">Secure</span>
+      </div>
 
       <form method="post">
         <div class="mb-3">
           <label class="form-label">Password</label>
-          <input type="password" name="password" class="form-control" required>
+          <input type="password" name="password" class="form-control" required autofocus>
         </div>
+
         <button class="btn btn-primary w-100">Login</button>
       </form>
+
+      <div class="text-muted mt-3 small">
+        Tip: this password comes from the <code>ADMIN_PASSWORD</code> environment variable.
+      </div>
+    </div>
+
+    <div class="text-center text-muted small mt-3">
+      <a href="{{ url_for('home') }}" class="text-decoration-none">← Back to dashboard</a>
     </div>
   </div>
 </div>
+
 {% endblock %}

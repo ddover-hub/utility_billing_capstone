@@ -1,45 +1,109 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="row">
-  <div class="col-md-5">
-    <div class="bg-white p-3 rounded shadow-sm">
-      <h2 class="h5">Add Customer</h2>
 
-      <form method="post">
-        <div class="mb-2">
-          <label class="form-label">Full Name</label>
-          <input class="form-control" name="full_name" required>
-        </div>
+<div class="d-flex justify-content-between align-items-start align-items-md-center flex-column flex-md-row gap-2 mb-3">
+  <div>
+    <h2 class="page-title mb-1">Customers</h2>
+    <div class="text-muted">Manage customer records for billing and analytics.</div>
+  </div>
 
-        <div class="mb-2">
-          <label class="form-label">Email</label>
-          <input class="form-control" name="email">
-        </div>
+  <div class="d-flex gap-2">
+    {% if session.get("is_admin") %}
+      <span class="badge-soft">Admin Mode</span>
+    {% else %}
+      <span class="badge bg-secondary">Read-only</span>
+    {% endif %}
+  </div>
+</div>
 
-        <button class="btn btn-success">Add Customer</button>
-      </form>
+<div class="row g-3">
+  <!-- LEFT: Customer table -->
+  <div class="col-lg-8">
+    <div class="card-ui bg-white p-3 p-md-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Customer List</h5>
+
+        <form class="d-flex" method="get" action="{{ url_for('customers') }}">
+          <input
+            class="form-control form-control-sm me-2"
+            type="search"
+            name="q"
+            placeholder="Search name/email…"
+            value="{{ request.args.get('q','') }}"
+          >
+          <button class="btn btn-sm btn-outline-secondary" type="submit">Search</button>
+        </form>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th class="d-none d-md-table-cell">Email</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in customers %}
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ c.full_name }}</div>
+                  <div class="text-muted small d-md-none">{{ c.email }}</div>
+                </td>
+
+                <td class="d-none d-md-table-cell">
+                  <span class="text-muted">{{ c.email }}</span>
+                </td>
+
+                <td class="text-end">
+                  <a class="btn btn-sm btn-primary"
+                     href="{{ url_for('customer_detail', customer_id=c.id) }}">
+                    View
+                  </a>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="3" class="text-center text-muted py-4">
+                  No customers found.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
     </div>
   </div>
 
-  <div class="col-md-7">
-    <div class="bg-white p-3 rounded shadow-sm">
-      <h2 class="h5">Customers</h2>
+  <!-- RIGHT: Add customer form -->
+  <div class="col-lg-4">
+    <div class="card-ui bg-white p-3 p-md-4">
+      <h5 class="mb-1">Add Customer</h5>
+      <div class="text-muted mb-3">Create a new customer record.</div>
 
-      <ul class="list-group mt-3">
-        {% for customer in customers %}
-          <li class="list-group-item d-flex justify-content-between">
-            {{ customer.full_name }}
-            <a class="btn btn-sm btn-outline-primary"
-               href="{{ url_for('customer_detail', customer_id=customer.id) }}">
-              View
-            </a>
-          </li>
-        {% else %}
-          <li class="list-group-item text-muted">No customers yet.</li>
-        {% endfor %}
-      </ul>
+      {% if session.get("is_admin") %}
+        <form method="post" action="{{ url_for('customers') }}">
+          <div class="mb-3">
+            <label class="form-label">Full name</label>
+            <input class="form-control" name="full_name" required placeholder="Jane Doe">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" type="email" name="email" required placeholder="jane@example.com">
+          </div>
+
+          <button class="btn btn-primary w-100">Add Customer</button>
+        </form>
+      {% else %}
+        <div class="alert alert-warning mb-0">
+          You’re not logged in as admin. <a href="{{ url_for('login') }}">Login</a> to add customers.
+        </div>
+      {% endif %}
     </div>
   </div>
 </div>
+
 {% endblock %}
