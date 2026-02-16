@@ -1,0 +1,48 @@
+:root {
+  --card-radius: 16px;
+}
+
+body {
+  background: #f6f7fb;
+}
+
+.page-title {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.card-ui {
+  border: 0;
+  border-radius: var(--card-radius);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.navbar-brand {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.kpi {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.kpi-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.table thead th {
+  color: #6c757d;
+  font-weight: 600;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.badge-soft {
+  background: rgba(13,110,253,0.12);
+  color: #0d6efd;
+  border-radius: 999px;
+  padding: 0.45rem 0.7rem;
+  font-weight: 600;
+}
