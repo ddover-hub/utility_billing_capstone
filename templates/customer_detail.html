@@ -9,19 +9,28 @@
 
   <h2 class="h6">Add Usage</h2>
   <form method="post" action="{{ url_for('add_usage', customer_id=customer.id) }}" class="row g-2">
-    <div class="col-4">
+    <div class="col-12 col-md-4">
       <input class="form-control" name="month" placeholder="2026-01" required>
     </div>
-    <div class="col-4">
-      <select class="form-select" name="utility_type">
+
+    <div class="col-12 col-md-4">
+      <select class="form-select" name="utility_type" id="utility_type">
         <option value="electric">electric</option>
         <option value="water">water</option>
         <option value="gas">gas</option>
       </select>
     </div>
-    <div class="col-4">
-      <input class="form-control" name="usage_value" placeholder="350" required>
+
+    <div class="col-12 col-md-4">
+      <div class="input-group">
+        <input class="form-control" name="usage_value" placeholder="350" required>
+        <span class="input-group-text" id="usage_unit">kWh</span>
+      </div>
+      <div class="form-text text-muted">
+        Electric = kWh, Water = gallons, Gas = CCF
+      </div>
     </div>
+
     <div class="col-12">
       <button class="btn btn-success">Add Usage</button>
     </div>
@@ -32,8 +41,15 @@
   <h2 class="h6">Usage Records</h2>
   <ul class="list-group">
     {% for r in usage %}
-      <li class="list-group-item">
-        {{ r.month }} — {{ r.utility_type }} — {{ r.usage_value }}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+          <strong>{{ r.month }}</strong>
+          — {{ r.utility_type }}
+          — {{ "%.2f"|format(r.usage_value) }} {{ units.get(r.utility_type, "") }}
+          {% if r.is_anomaly %}
+            <span class="badge bg-danger ms-2">Anomaly</span>
+          {% endif %}
+        </span>
       </li>
     {% else %}
       <li class="list-group-item text-muted">No usage records.</li>
@@ -59,5 +75,28 @@
   <img class="img-fluid border"
        src="{{ url_for('usage_chart', customer_id=customer.id) }}"
        alt="Usage chart">
+
+  <script>
+    (function () {
+      const units = {
+        electric: "kWh",
+        water: "gallons",
+        gas: "CCF"
+      };
+
+      const typeEl = document.getElementById("utility_type");
+      const unitEl = document.getElementById("usage_unit");
+
+      function syncUnit() {
+        const t = typeEl?.value || "electric";
+        unitEl.textContent = units[t] || "";
+      }
+
+      if (typeEl && unitEl) {
+        typeEl.addEventListener("change", syncUnit);
+        syncUnit();
+      }
+    })();
+  </script>
 </div>
 {% endblock %}

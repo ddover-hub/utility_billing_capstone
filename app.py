@@ -2,13 +2,14 @@ import io
 import os
 from datetime import date, datetime
 
+import math
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from flask import Flask, Response, redirect, render_template, request, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, func
 from functools import wraps
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -52,9 +53,6 @@ def logout():
     flash("Logged out.", "info")
     return redirect(url_for("home"))
 
-with app.app_context():
-    db.create_all()
-
 # ----------------------------
 # Models
 # ----------------------------
@@ -73,6 +71,7 @@ class UsageRecord(db.Model):
     __tablename__ = "usage_records"
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey("customers.id"), nullable=False)
+    is_anomaly = db.Column(db.Boolean, nullable=False, default=False)
 
     # YYYY-MM (e.g., "2026-01")
     month = db.Column(db.String(7), nullable=False)
@@ -119,6 +118,37 @@ DEFAULT_RATES = {
     "gas": {"rate_per_unit": 1.20, "base_fee": 12.00},      # $/therm (example)
 }
 
+UTILITY_UNITS = {
+    "electric": "kWh",
+    "water": "gallons",
+    "gas": "CCF",
+}
+
+def compute_anomaly_flag(customer_id: int, utility_type: str, new_value: float) -> bool:
+    """
+    Flags anomalies using a simple rule:
+    new_value > mean + 2 * std, computed from that customer's past records
+    for the same utility type.
+
+    Needs at least 5 prior records to avoid noisy flags.
+    """
+    history = (UsageRecord.query
+               .filter_by(customer_id=customer_id, utility_type=utility_type)
+               .order_by(UsageRecord.month.asc())
+               .all())
+
+    if len(history) < 5:
+        return False
+
+    vals = [r.usage_value for r in history]
+    mean = sum(vals) / len(vals)
+
+    var = sum((x - mean) ** 2 for x in vals) / len(vals)
+    std = math.sqrt(var)
+
+    # If std is 0, only flag if it's strictly higher than mean
+    threshold = mean + (2 * std)
+    return new_value > threshold if std > 0 else new_value > mean
 
 # ----------------------------
 # Routes
@@ -133,6 +163,40 @@ def home():
                            usage_count=usage_count,
                            bill_count=bill_count)
 
+@app.get("/charts/total_electric_usage.png")
+def total_electric_usage_chart():
+    # Sum electric usage across ALL customers, grouped by month
+    rows = (
+        db.session.query(UsageRecord.month, func.sum(UsageRecord.usage_value))
+        .filter(UsageRecord.utility_type == "electric")
+        .group_by(UsageRecord.month)
+        .order_by(UsageRecord.month.asc())
+        .all()
+    )
+
+    months = [r[0] for r in rows]
+    totals = [float(r[1]) for r in rows]
+
+    fig, ax = plt.subplots(figsize=(10, 3.2))
+    ax.set_title("Total Electric Usage Over Time (All Customers)")
+    ax.set_xlabel("Month")
+    ax.set_ylabel("Total Usage (kWh)")
+
+    if months:
+        ax.plot(months, totals, marker="o", linewidth=2)
+        ax.tick_params(axis="x", rotation=45)
+        ax.grid(True, alpha=0.25)
+    else:
+        ax.text(0.5, 0.5, "No electric usage records yet", ha="center", va="center", transform=ax.transAxes)
+
+    fig.tight_layout()
+
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=150)
+    plt.close(fig)
+    buf.seek(0)
+
+    return Response(buf.getvalue(), mimetype="image/png")
 
 @app.route("/customers", methods=["GET", "POST"])
 def customers():
@@ -164,7 +228,13 @@ def customer_detail(customer_id: int):
              .filter_by(customer_id=customer_id)
              .order_by(Bill.month.asc(), Bill.utility_type.asc())
              .all())
-    return render_template("customer_detail.html", customer=customer, usage=usage, bills=bills)
+    return render_template(
+    "customer_detail.html",
+    customer=customer,
+    usage=usage,
+    bills=bills,
+    units=UTILITY_UNITS
+)
 
 
 @app.route("/customers/<int:customer_id>/usage", methods=["POST"])
@@ -191,12 +261,26 @@ def add_usage(customer_id: int):
         flash("Invalid utility type.", "danger")
         return redirect(url_for("customer_detail", customer_id=customer_id))
 
-    record = UsageRecord(customer_id=customer_id, month=month, utility_type=utility_type, usage_value=usage_value)
+    # Compute anomaly flag BEFORE creating record
+    is_anomaly = compute_anomaly_flag(customer_id, utility_type, usage_value)
+
+    record = UsageRecord(
+        customer_id=customer_id,
+        month=month,
+        utility_type=utility_type,
+        usage_value=usage_value,
+        is_anomaly=is_anomaly
+    )
 
     try:
         db.session.add(record)
         db.session.commit()
-        flash("Usage record added.", "success")
+
+        if is_anomaly:
+            flash("⚠️ This usage looks abnormal (flagged as an anomaly).", "warning")
+        else:
+            flash("Usage record added.", "success")
+
     except Exception:
         db.session.rollback()
         flash("That usage record already exists for that month/type (or another DB error occurred).", "danger")
