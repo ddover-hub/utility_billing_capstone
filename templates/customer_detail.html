@@ -71,10 +71,63 @@
 
   <hr>
 
-  <h2 class="h6">Electric Usage Chart</h2>
-  <img class="img-fluid border"
-       src="{{ url_for('usage_chart', customer_id=customer.id) }}"
-       alt="Usage chart">
+<h2 class="h6 mb-3">Usage Charts</h2>
+
+<ul class="nav nav-tabs mb-3" id="usageChartTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="electric-tab" data-bs-toggle="tab" data-bs-target="#electric-pane" type="button" role="tab">
+      Electric
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="water-tab" data-bs-toggle="tab" data-bs-target="#water-pane" type="button" role="tab">
+      Water
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="gas-tab" data-bs-toggle="tab" data-bs-target="#gas-pane" type="button" role="tab">
+      Gas
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content" id="usageChartTabsContent">
+  <div class="tab-pane fade show active" id="electric-pane" role="tabpanel">
+    <div class="card-ui bg-white p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <strong>Electric Usage</strong>
+        <span class="text-muted small">kWh</span>
+      </div>
+      <img class="img-fluid border rounded"
+           src="{{ url_for('usage_chart', customer_id=customer.id, utility_type='electric') }}"
+           alt="Electric usage chart">
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="water-pane" role="tabpanel">
+    <div class="card-ui bg-white p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <strong>Water Usage</strong>
+        <span class="text-muted small">gallons</span>
+      </div>
+      <img class="img-fluid border rounded"
+           src="{{ url_for('usage_chart', customer_id=customer.id, utility_type='water') }}"
+           alt="Water usage chart">
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="gas-pane" role="tabpanel">
+    <div class="card-ui bg-white p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <strong>Gas Usage</strong>
+        <span class="text-muted small">CCF</span>
+      </div>
+      <img class="img-fluid border rounded"
+           src="{{ url_for('usage_chart', customer_id=customer.id, utility_type='gas') }}"
+           alt="Gas usage chart">
+    </div>
+  </div>
+</div>
 
   <script>
     (function () {

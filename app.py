@@ -324,9 +324,41 @@ def generate_bill(customer_id: int):
     return redirect(url_for("customer_detail", customer_id=customer_id))
 
 
-@app.get("/customers/<int:customer_id>/usage_chart.png")
-def usage_chart(customer_id: int):
+@app.get("/customers/<int:customer_id>/usage_chart/<utility_type>.png")
+def usage_chart(customer_id: int, utility_type: str):
     customer = Customer.query.get_or_404(customer_id)
+
+    if utility_type not in ("electric", "water", "gas"):
+        return Response("Invalid utility type", status=400)
+
+    records = (UsageRecord.query
+               .filter_by(customer_id=customer_id, utility_type=utility_type)
+               .order_by(UsageRecord.month.asc())
+               .all())
+
+    months = [r.month for r in records]
+    values = [r.usage_value for r in records]
+    unit = UTILITY_UNITS.get(utility_type, "")
+
+    fig, ax = plt.subplots(figsize=(10, 3.2))
+    ax.set_title(f"{utility_type.title()} Usage Over Time — {customer.full_name}")
+    ax.set_xlabel("Month")
+    ax.set_ylabel(f"Usage ({unit})" if unit else "Usage")
+
+    if months:
+        ax.plot(months, values, marker="o", linewidth=2)
+        ax.tick_params(axis="x", rotation=45)
+        ax.grid(True, alpha=0.25)
+    else:
+        ax.text(0.5, 0.5, f"No {utility_type} usage records yet",
+                ha="center", va="center", transform=ax.transAxes)
+
+    fig.tight_layout()
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=150)
+    plt.close(fig)
+    buf.seek(0)
+    return Response(buf.getvalue(), mimetype="image/png")
 
     # For demo: chart electric usage over time
     records = (UsageRecord.query
